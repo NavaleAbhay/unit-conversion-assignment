@@ -1,0 +1,45 @@
+{
+  "info": {
+    "_postman_id": "8d2a42b5-00df-473c-8893-810bc1b3630e",
+    "name": "Conversion-api",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "25454548"
+  },
+  "item": [
+    {
+      "name": "Conversion",
+      "item": [
+        {
+          "name": "Convert",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"value\": 10,\r\n  \"fromUnit\": \"meter\",\r\n  \"toUnit\": \"kilogram\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:5145/api/conversion/convert",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "5145",
+              "path": [
+                "api",
+                "conversion",
+                "convert"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}

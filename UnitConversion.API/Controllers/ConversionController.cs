@@ -19,10 +19,6 @@ public sealed class ConversionController : ControllerBase
     public IActionResult Convert([FromBody] ConversionRequest request)
     {
         var response = _conversionService.Convert(request);
-        
-        if (response.Success)
-            return Ok(response);
-        
-        return BadRequest(response);
+        return Ok(response);
     }
 }
