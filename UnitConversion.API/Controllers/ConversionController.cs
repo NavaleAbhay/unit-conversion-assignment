@@ -10,8 +10,7 @@ public sealed class ConversionController : ControllerBase
 {
     private readonly IConversionService _conversionService;
 
-    public ConversionController(
-        IConversionService conversionService)
+    public ConversionController(IConversionService conversionService)
     {
         _conversionService = conversionService;
     }
@@ -19,7 +18,11 @@ public sealed class ConversionController : ControllerBase
     [HttpPost("convert")]
     public IActionResult Convert([FromBody] ConversionRequest request)
     {
-        var result = _conversionService.Convert(request);
-        return Ok(result);
+        var response = _conversionService.Convert(request);
+        
+        if (response.Success)
+            return Ok(response);
+        
+        return BadRequest(response);
     }
 }

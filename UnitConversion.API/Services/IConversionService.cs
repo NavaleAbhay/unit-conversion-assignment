@@ -4,5 +4,5 @@ namespace UnitConversion.API.Services;
 
 public interface IConversionService
 {
-    ConversionResponse Convert(ConversionRequest request);
+    ApiResponse<ConversionResponse> Convert(ConversionRequest request);
 }
