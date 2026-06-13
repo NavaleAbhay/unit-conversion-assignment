@@ -17,7 +17,22 @@ public class ConversionService : IConversionService
         var fromUnit = ResolveUnit(request.FromUnit);
         var toUnit = ResolveUnit(request.ToUnit);
 
-        var result = ConvertLength(request.Value, fromUnit.FactorToBase, toUnit.FactorToBase);
+        double result;
+
+        switch (fromUnit.Category)
+        {
+            case "length":
+                result = ConvertLength(request.Value, fromUnit.FactorToBase, toUnit.FactorToBase);
+                break;
+            case "weight":
+                result = ConvertWeight(request.Value, fromUnit.FactorToBase, toUnit.FactorToBase);
+                break;
+            case "temperature":
+                result = ConvertTemperature(request.Value, request.FromUnit, request.ToUnit);
+                break;
+            default:
+                throw new InvalidOperationException($"Unknown category: {fromUnit.Category}");
+        }
 
         return new ConversionResponse
         {
@@ -37,5 +52,49 @@ public class ConversionService : IConversionService
     private static double ConvertLength(double value, double fromFactorToBase, double toFactorToBase)
     {
         return value * fromFactorToBase / toFactorToBase;
+    }
+
+    private static double ConvertWeight(double value, double fromFactorToBase, double toFactorToBase)
+    {
+        return value * fromFactorToBase / toFactorToBase;
+    }
+
+    private static double ConvertTemperature(double value, string fromUnit, string toUnit)
+    {
+        double celsius;
+
+        switch (fromUnit.ToLower())
+        {
+            case "celsius":
+                celsius = value;
+                break;
+            case "fahrenheit":
+                celsius = (value - 32) * 5 / 9;
+                break;
+            case "kelvin":
+                celsius = value - 273.15;
+                break;
+            default:
+                throw new InvalidOperationException($"Unknown temperature unit: {fromUnit}");
+        }
+
+        double result;
+
+        switch (toUnit.ToLower())
+        {
+            case "celsius":
+                result = celsius;
+                break;
+            case "fahrenheit":
+                result = celsius * 9 / 5 + 32;
+                break;
+            case "kelvin":
+                result = celsius + 273.15;
+                break;
+            default:
+                throw new InvalidOperationException($"Unknown temperature unit: {toUnit}");
+        }
+
+        return result;
     }
 }
