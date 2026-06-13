@@ -5,7 +5,7 @@ using UnitConversion.API.Services;
 namespace UnitConversion.API.Controllers;
 
 [ApiController]
-[Route("api")]
+[Route("api/[controller]")]
 public sealed class ConversionController : ControllerBase
 {
     private readonly IConversionService _conversionService;

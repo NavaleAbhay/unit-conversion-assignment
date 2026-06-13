@@ -1,15 +1,19 @@
 using UnitConversion.API.Models;
 using UnitConversion.API.Providers;
 using UnitConversion.API.Services;
+using UnitConversion.API.Services.Factories;
 
 namespace UnitConversion.Api.Services;
+
 public class ConversionService : IConversionService
 {
     private readonly IUnitDefinitionProvider _unitProvider;
+    private readonly ConversionStrategyFactory _strategyFactory;
 
     public ConversionService(IUnitDefinitionProvider unitProvider)
     {
         _unitProvider = unitProvider;
+        _strategyFactory = new ConversionStrategyFactory();
     }
 
     public ConversionResponse Convert(ConversionRequest request)
@@ -17,22 +21,8 @@ public class ConversionService : IConversionService
         var fromUnit = ResolveUnit(request.FromUnit);
         var toUnit = ResolveUnit(request.ToUnit);
 
-        double result;
-
-        switch (fromUnit.Category)
-        {
-            case "length":
-                result = ConvertLength(request.Value, fromUnit.FactorToBase, toUnit.FactorToBase);
-                break;
-            case "weight":
-                result = ConvertWeight(request.Value, fromUnit.FactorToBase, toUnit.FactorToBase);
-                break;
-            case "temperature":
-                result = ConvertTemperature(request.Value, request.FromUnit, request.ToUnit);
-                break;
-            default:
-                throw new InvalidOperationException($"Unknown category: {fromUnit.Category}");
-        }
+        var strategy = _strategyFactory.GetStrategy(fromUnit.Category);
+        var result = strategy.ExecuteConversion(request.Value, fromUnit, toUnit, request.FromUnit, request.ToUnit);
 
         return new ConversionResponse
         {
@@ -47,54 +37,5 @@ public class ConversionService : IConversionService
     private UnitDefinition ResolveUnit(string name)
     {
         return _unitProvider.GetUnit(name);
-    }
-
-    private static double ConvertLength(double value, double fromFactorToBase, double toFactorToBase)
-    {
-        return value * fromFactorToBase / toFactorToBase;
-    }
-
-    private static double ConvertWeight(double value, double fromFactorToBase, double toFactorToBase)
-    {
-        return value * fromFactorToBase / toFactorToBase;
-    }
-
-    private static double ConvertTemperature(double value, string fromUnit, string toUnit)
-    {
-        double celsius;
-
-        switch (fromUnit.ToLower())
-        {
-            case "celsius":
-                celsius = value;
-                break;
-            case "fahrenheit":
-                celsius = (value - 32) * 5 / 9;
-                break;
-            case "kelvin":
-                celsius = value - 273.15;
-                break;
-            default:
-                throw new InvalidOperationException($"Unknown temperature unit: {fromUnit}");
-        }
-
-        double result;
-
-        switch (toUnit.ToLower())
-        {
-            case "celsius":
-                result = celsius;
-                break;
-            case "fahrenheit":
-                result = celsius * 9 / 5 + 32;
-                break;
-            case "kelvin":
-                result = celsius + 273.15;
-                break;
-            default:
-                throw new InvalidOperationException($"Unknown temperature unit: {toUnit}");
-        }
-
-        return result;
     }
 }
